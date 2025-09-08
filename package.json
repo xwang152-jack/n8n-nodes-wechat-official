@@ -1,6 +1,6 @@
 {
-  "name": "@xwang152/n8n-nodes-wechat-offiaccount",
-  "version": "0.1.0",
+  "name": "n8n-nodes-wechat-official",
+  "version": "0.1.1",
   "description": "n8n community node for WeChat Official Account API integration",
   "keywords": [
     "n8n-community-node-package",
