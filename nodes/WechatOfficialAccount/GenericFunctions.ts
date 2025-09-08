@@ -28,18 +28,27 @@ export async function wechatApiRequest(
 	console.log('[DEBUG] wechatApiRequest - Credentials:', { appid, appsecret, baseUrl });
 	console.log('[DEBUG] wechatApiRequest - Endpoint:', endpoint);
 
-	// 验证baseUrl
+	// 验证和标准化baseUrl
 	if (!baseUrl || typeof baseUrl !== 'string') {
 		throw new NodeOperationError(this.getNode(), 
 			`微信公众号配置错误：baseUrl 无效或未设置。\n` +
-			`请检查您的凭据配置，确保 baseUrl 字段已正确设置为微信API地址（如：https://api.weixin.qq.com）。\n` +
+			`请检查您的凭据配置，确保 baseUrl 字段已正确设置为微信API地址（如：api.weixin.qq.com）。\n` +
 			`当前 baseUrl 值：${baseUrl}`
 		);
 	}
 
+	// 标准化baseUrl
+	let normalizedBaseUrl = baseUrl as string;
+	console.log('[DEBUG] wechatApiRequest - Original baseUrl:', baseUrl);
+	if (!normalizedBaseUrl.startsWith('http://') && !normalizedBaseUrl.startsWith('https://')) {
+		normalizedBaseUrl = `https://${normalizedBaseUrl}`;
+		console.log('[DEBUG] wechatApiRequest - Added https:// prefix to baseUrl');
+	}
+	console.log('[DEBUG] wechatApiRequest - Normalized baseUrl:', normalizedBaseUrl);
+
 	// 如果需要access_token，先获取
 	if (endpoint !== '/cgi-bin/token' && !query.access_token) {
-		const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl as string);
+		const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, normalizedBaseUrl);
 		query.access_token = tokenResponse.access_token;
 	}
 
@@ -49,9 +58,15 @@ export async function wechatApiRequest(
 		query.secret = appsecret;
 	}
 
-	// 构建完整URL
-	const fullUrl = `${baseUrl}${endpoint}`;
+	// 构建完整的URL
+	const fullUrl = `${normalizedBaseUrl}${endpoint}`;
+	console.log('[DEBUG] wechatApiRequest - Endpoint:', endpoint);
 	console.log('[DEBUG] wechatApiRequest - Full URL:', fullUrl);
+	console.log('[DEBUG] wechatApiRequest - URL validation:', {
+		isValidUrl: /^https?:\/\/.+/.test(fullUrl),
+		hasProtocol: fullUrl.startsWith('http'),
+		urlLength: fullUrl.length
+	});
 
 	const options: IRequestOptions = {
 		headers: {
@@ -98,18 +113,34 @@ async function getAccessToken(
 	// 添加调试日志
 	console.log('[DEBUG] getAccessToken - Parameters:', { appid, appsecret, baseUrl });
 
-	// 验证baseUrl
+	// 验证和标准化baseUrl
 	if (!baseUrl || typeof baseUrl !== 'string') {
 		throw new NodeOperationError(this.getNode(), 
 			`微信公众号配置错误：baseUrl 无效或未设置。\n` +
-			`请检查您的凭据配置，确保 baseUrl 字段已正确设置为微信API地址（如：https://api.weixin.qq.com）。\n` +
+			`请检查您的凭据配置，确保 baseUrl 字段已正确设置为微信API地址（如：api.weixin.qq.com）。\n` +
 			`当前 baseUrl 值：${baseUrl}`
 		);
 	}
 
+	// 标准化baseUrl，确保包含协议前缀
+	let normalizedBaseUrl = baseUrl.trim();
+	console.log('[DEBUG] getAccessToken - Original baseUrl:', baseUrl);
+	console.log('[DEBUG] getAccessToken - Input parameters:', { appid: appid?.substring(0, 8) + '...', appsecret: appsecret ? 'provided' : 'missing', baseUrl });
+	if (!normalizedBaseUrl.startsWith('http://') && !normalizedBaseUrl.startsWith('https://')) {
+		normalizedBaseUrl = `https://${normalizedBaseUrl}`;
+		console.log('[DEBUG] getAccessToken - Added https:// prefix to baseUrl');
+	}
+	console.log('[DEBUG] getAccessToken - Normalized baseUrl:', normalizedBaseUrl);
+
 	// 构建完整URL
-	const fullUrl = `${baseUrl}/cgi-bin/token`;
+	const fullUrl = `${normalizedBaseUrl}/cgi-bin/token`;
 	console.log('[DEBUG] getAccessToken - Full URL:', fullUrl);
+	console.log('[DEBUG] getAccessToken - URL validation:', {
+		isValidUrl: /^https?:\/\/.+/.test(fullUrl),
+		hasProtocol: fullUrl.startsWith('http'),
+		urlLength: fullUrl.length,
+		containsToken: fullUrl.includes('/cgi-bin/token')
+	});
 
 	const options: IRequestOptions = {
 		headers: {
@@ -222,8 +253,14 @@ export async function uploadImage(
 
 	const { appid, appsecret, baseUrl } = credentials;
 
+	// 标准化baseUrl
+	let normalizedBaseUrl = baseUrl as string;
+	if (!normalizedBaseUrl.startsWith('http://') && !normalizedBaseUrl.startsWith('https://')) {
+		normalizedBaseUrl = `https://${normalizedBaseUrl}`;
+	}
+
 	// 获取access_token
-	const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl as string);
+	const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, normalizedBaseUrl);
 
 	// 处理不同的输入类型
 	let base64Data: string;
@@ -254,7 +291,7 @@ export async function uploadImage(
 		qs: {
 			access_token: tokenResponse.access_token,
 		},
-		uri: `${baseUrl as string}/cgi-bin/media/uploadimg`,
+		uri: `${normalizedBaseUrl}/cgi-bin/media/uploadimg`,
 		formData,
 		json: true,
 	};
@@ -351,8 +388,14 @@ export async function addMaterial(
 
 	const { appid, appsecret, baseUrl } = credentials;
 
+	// 标准化baseUrl
+	let normalizedBaseUrl = baseUrl as string;
+	if (!normalizedBaseUrl.startsWith('http://') && !normalizedBaseUrl.startsWith('https://')) {
+		normalizedBaseUrl = `https://${normalizedBaseUrl}`;
+	}
+
 	// 获取access_token
-	const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl as string);
+	const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, normalizedBaseUrl);
 
 	// 处理不同的输入类型
 	let base64Data: string;
@@ -389,7 +432,7 @@ export async function addMaterial(
 		qs: {
 			access_token: tokenResponse.access_token,
 		},
-		uri: `${baseUrl as string}/cgi-bin/material/add_material`,
+		uri: `${normalizedBaseUrl}/cgi-bin/material/add_material`,
 		formData,
 		json: true,
 	};
