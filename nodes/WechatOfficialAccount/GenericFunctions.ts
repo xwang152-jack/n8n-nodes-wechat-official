@@ -16,7 +16,7 @@ export async function wechatApiRequest(
 	body: any = {},
 	query: any = {},
 ): Promise<any> {
-	const credentials = await this.getCredentials('wechatOfficialAccountApi');
+	const credentials = await this.getCredentials('wechatOfficialAccountCredentialsApi');
 
 	if (!credentials) {
 		throw new NodeOperationError(this.getNode(), 'No credentials returned!');
@@ -168,7 +168,7 @@ export async function uploadImage(
 	imageData: string,
 	inputType?: string,
 ): Promise<any> {
-	const credentials = await this.getCredentials('wechatOfficialAccountApi');
+	const credentials = await this.getCredentials('wechatOfficialAccountCredentialsApi');
 
 	if (!credentials) {
 		throw new NodeOperationError(this.getNode(), 'No credentials returned!');
@@ -298,7 +298,7 @@ export async function addMaterial(
 	description?: any,
 	inputType?: string,
 ): Promise<any> {
-	const credentials = await this.getCredentials('wechatOfficialAccountApi');
+	const credentials = await this.getCredentials('wechatOfficialAccountCredentialsApi');
 
 	if (!credentials) {
 		throw new NodeOperationError(this.getNode(), 'No credentials returned!');
