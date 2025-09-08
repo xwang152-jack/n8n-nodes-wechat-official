@@ -117,7 +117,9 @@ async function getAccessToken(
  */
 function validateImageFormat(url: string): boolean {
 	const validExtensions = ['.jpg', '.jpeg', '.png'];
-	return validExtensions.some(ext => url.toLowerCase().includes(ext));
+	// 移除查询参数和锚点，只检查路径部分
+	const urlPath = url.split('?')[0].split('#')[0].toLowerCase();
+	return validExtensions.some(ext => urlPath.endsWith(ext));
 }
 
 /**
