@@ -119,7 +119,20 @@ function validateImageFormat(url: string): boolean {
 	const validExtensions = ['.jpg', '.jpeg', '.png'];
 	// 移除查询参数和锚点，只检查路径部分
 	const urlPath = url.split('?')[0].split('#')[0].toLowerCase();
-	return validExtensions.some(ext => urlPath.endsWith(ext));
+	
+	// 添加调试日志
+	console.log('[DEBUG] validateImageFormat - Original URL:', url);
+	console.log('[DEBUG] validateImageFormat - Processed URL path:', urlPath);
+	console.log('[DEBUG] validateImageFormat - Valid extensions:', validExtensions);
+	
+	const result = validExtensions.some(ext => {
+		const matches = urlPath.endsWith(ext);
+		console.log(`[DEBUG] validateImageFormat - Checking ${ext}: ${matches}`);
+		return matches;
+	});
+	
+	console.log('[DEBUG] validateImageFormat - Final result:', result);
+	return result;
 }
 
 /**
@@ -129,10 +142,13 @@ async function downloadImageFromUrl(
 	this: IExecuteFunctions,
 	imageUrl: string,
 ): Promise<string> {
+	console.log('[DEBUG] downloadImageFromUrl - Starting validation for URL:', imageUrl);
 	// 验证图片格式
 	if (!validateImageFormat(imageUrl)) {
+		console.log('[DEBUG] downloadImageFromUrl - Validation FAILED for URL:', imageUrl);
 		throw new NodeOperationError(this.getNode(), '不支持的图片格式，仅支持 jpg/jpeg/png 格式');
 	}
+	console.log('[DEBUG] downloadImageFromUrl - Validation PASSED for URL:', imageUrl);
 
 	try {
 		const response = await this.helpers.request({
@@ -237,11 +253,15 @@ async function downloadMediaFromUrl(
 	mediaUrl: string,
 	mediaType: string,
 ): Promise<string> {
+	console.log('[DEBUG] downloadMediaFromUrl - Starting for URL:', mediaUrl, 'Type:', mediaType);
 	// 对于图片类型，验证格式
 	if (mediaType === 'image' || mediaType === 'thumb') {
+		console.log('[DEBUG] downloadMediaFromUrl - Validating image format for:', mediaUrl);
 		if (!validateImageFormat(mediaUrl)) {
+			console.log('[DEBUG] downloadMediaFromUrl - Image validation FAILED for:', mediaUrl);
 			throw new NodeOperationError(this.getNode(), '不支持的图片格式，仅支持 jpg/jpeg/png 格式');
 		}
+		console.log('[DEBUG] downloadMediaFromUrl - Image validation PASSED for:', mediaUrl);
 	}
 
 	try {
