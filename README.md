@@ -286,7 +286,7 @@ Ensure your WeChat Official Account has the following permissions:
 
 ## 📄 License
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+[MIT](https://github.com/xwang152-jack/n8n-nodes-wechat-official/blob/master/LICENSE.md)
 
 ## 👨‍💻 Author
 

@@ -10,6 +10,7 @@ import {
 export class WechatOfficialAccountCredentialsApi implements ICredentialType {
 	name = 'wechatOfficialAccountCredentialsApi';
 	displayName = 'Wechat Official Account Credentials API';
+	documentationUrl = 'https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html';
 	
 	properties: INodeProperties[] = [
 		{
@@ -34,6 +35,9 @@ export class WechatOfficialAccountCredentialsApi implements ICredentialType {
 			type: 'string',
 			default: '',
 			required: true,
+			typeOptions: {
+				password: true,
+			},
 		},
 		{
 			displayName: 'AccessToken',

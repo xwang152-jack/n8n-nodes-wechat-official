@@ -5,7 +5,7 @@
 ## 📋 前置要求
 
 - Docker 和 Docker Compose 已安装
-- 已构建的插件包文件 `n8n-nodes-wechat-offiaccount-0.1.0.tgz`
+- 已构建的插件包文件 `n8n-nodes-wechat-official-0.1.0.tgz`
 - 了解 n8n 用户节点目录概念（推荐部署方式）
 
 ## 🚀 快速部署
@@ -20,7 +20,7 @@
 
 1. **确保文件结构**
    ```
-   n8n-nodes-wechat-offiaccount/
+   n8n-nodes-wechat-official/
    ├── docker-compose.yml          # 已配置用户节点目录挂载
    ├── install-plugin.sh           # 用户节点安装脚本
    ├── dist/                       # 构建输出目录
@@ -104,13 +104,13 @@ volumes:
 
 1. **复制插件包到容器**
    ```bash
-   docker cp n8n-nodes-wechat-offiaccount-0.1.0.tgz <container_name>:/tmp/
+   docker cp n8n-nodes-wechat-official-0.1.0.tgz <container_name>:/tmp/
    ```
 
 2. **进入容器安装**
    ```bash
    docker exec -it <container_name> /bin/sh
-   npm install -g /tmp/n8n-nodes-wechat-offiaccount-0.1.0.tgz
+   npm install -g /tmp/n8n-nodes-wechat-official-0.1.0.tgz
    exit
    ```
 
@@ -293,7 +293,7 @@ docker logs --tail 100 n8n-wechat
    docker-compose down
    
    # 清理旧的挂载内容（可选）
-   docker volume rm n8n-nodes-wechat-offiaccount_n8n_data
+   docker volume rm n8n-nodes-wechat-official_n8n_data
    
    # 重新启动服务
    docker-compose up -d

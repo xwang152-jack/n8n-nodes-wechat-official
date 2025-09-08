@@ -8,18 +8,18 @@ set -e
 echo "开始安装微信公众号n8n节点插件..."
 
 # 检查插件包是否存在
-if [ ! -f "/tmp/n8n-nodes-wechat-offiaccount-0.1.0.tgz" ]; then
+if [ ! -f "/tmp/n8n-nodes-wechat-official-0.1.0.tgz" ]; then
     echo "错误: 插件包文件不存在"
     exit 1
 fi
 
 # 全局安装插件包
 echo "正在安装插件包..."
-npm install -g /tmp/n8n-nodes-wechat-offiaccount-0.1.0.tgz
+npm install -g /tmp/n8n-nodes-wechat-official-0.1.0.tgz
 
 # 验证安装
 echo "验证插件安装..."
-npm list -g n8n-nodes-wechat-offiaccount
+npm list -g n8n-nodes-wechat-official
 
 if [ $? -eq 0 ]; then
     echo "✅ 微信公众号n8n节点插件安装成功!"

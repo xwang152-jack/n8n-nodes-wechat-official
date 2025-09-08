@@ -1,5 +1,5 @@
 {
-  "name": "n8n-nodes-wechat-offiaccount",
+  "name": "@xwang152/n8n-nodes-wechat-offiaccount",
   "version": "0.1.0",
   "description": "n8n community node for WeChat Official Account API integration",
   "keywords": [
@@ -10,17 +10,17 @@
     "api"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/xwang152-jack/n8n-nodes-wechat-offiaccount",
+  "homepage": "https://github.com/xwang152-jack/n8n-nodes-wechat-official",
   "author": {
     "name": "xwang152-jack",
     "email": "xwang152@163.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xwang152-jack/n8n-nodes-wechat-offiaccount.git"
+    "url": "https://github.com/xwang152-jack/n8n-nodes-wechat-official.git"
   },
   "bugs": {
-    "url": "https://github.com/xwang152-jack/n8n-nodes-wechat-offiaccount/issues"
+    "url": "https://github.com/xwang152-jack/n8n-nodes-wechat-official/issues"
   },
   "engines": {
     "node": ">=20.15"

@@ -8,13 +8,13 @@ WORKDIR /tmp
 USER root
 
 # 复制插件包和安装脚本
-COPY n8n-nodes-wechat-offiaccount-0.1.0.tgz /tmp/
+COPY n8n-nodes-wechat-official-0.1.0.tgz /tmp/
 COPY install-plugin.sh /tmp/
 
 # 安装插件
 RUN chmod +x /tmp/install-plugin.sh && \
-    npm install -g /tmp/n8n-nodes-wechat-offiaccount-0.1.0.tgz && \
-    rm -f /tmp/n8n-nodes-wechat-offiaccount-0.1.0.tgz /tmp/install-plugin.sh
+    npm install -g /tmp/n8n-nodes-wechat-official-0.1.0.tgz && \
+    rm -f /tmp/n8n-nodes-wechat-official-0.1.0.tgz /tmp/install-plugin.sh
 
 # 切换回node用户
 USER node
