@@ -22,7 +22,7 @@ export async function wechatApiRequest(
 		throw new NodeOperationError(this.getNode(), 'No credentials returned!');
 	}
 
-	const { appId, appSecret, environment } = credentials;
+	const { appid, appsecret, environment } = credentials;
 
 	// 构建基础URL
 	const baseUrl = environment === 'sandbox' 
@@ -31,14 +31,14 @@ export async function wechatApiRequest(
 
 	// 如果需要access_token，先获取
 	if (endpoint !== '/cgi-bin/token' && !query.access_token) {
-		const tokenResponse = await getAccessToken.call(this, appId as string, appSecret as string, baseUrl);
+		const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl);
 		query.access_token = tokenResponse.access_token;
 	}
 
 	// 如果是获取token的请求，添加必要参数
 	if (endpoint === '/cgi-bin/token') {
-		query.appid = appId;
-		query.secret = appSecret;
+		query.appid = appid;
+		query.secret = appsecret;
 	}
 
 	const options: IRequestOptions = {
@@ -79,8 +79,8 @@ export async function wechatApiRequest(
  */
 async function getAccessToken(
 	this: IExecuteFunctions,
-	appId: string,
-	appSecret: string,
+	appid: string,
+	appsecret: string,
 	baseUrl: string,
 ): Promise<any> {
 	const options: IRequestOptions = {
@@ -91,8 +91,8 @@ async function getAccessToken(
 		method: 'GET',
 		qs: {
 			grant_type: 'client_credential',
-			appid: appId,
-			secret: appSecret,
+			appid: appid,
+			secret: appsecret,
 		},
 		uri: `${baseUrl}/cgi-bin/token`,
 		json: true,
@@ -174,7 +174,7 @@ export async function uploadImage(
 		throw new NodeOperationError(this.getNode(), 'No credentials returned!');
 	}
 
-	const { appId, appSecret, environment } = credentials;
+	const { appid, appsecret, environment } = credentials;
 
 	// 构建基础URL
 	const baseUrl = environment === 'sandbox' 
@@ -182,7 +182,7 @@ export async function uploadImage(
 		: 'https://api.weixin.qq.com';
 
 	// 获取access_token
-	const tokenResponse = await getAccessToken.call(this, appId as string, appSecret as string, baseUrl);
+	const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl);
 
 	// 处理不同的输入类型
 	let base64Data: string;
