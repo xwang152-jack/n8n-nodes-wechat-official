@@ -24,6 +24,19 @@ export async function wechatApiRequest(
 
 	const { appid, appsecret, baseUrl } = credentials;
 
+	// 添加调试日志
+	console.log('[DEBUG] wechatApiRequest - Credentials:', { appid, appsecret, baseUrl });
+	console.log('[DEBUG] wechatApiRequest - Endpoint:', endpoint);
+
+	// 验证baseUrl
+	if (!baseUrl || typeof baseUrl !== 'string') {
+		throw new NodeOperationError(this.getNode(), 
+			`微信公众号配置错误：baseUrl 无效或未设置。\n` +
+			`请检查您的凭据配置，确保 baseUrl 字段已正确设置为微信API地址（如：https://api.weixin.qq.com）。\n` +
+			`当前 baseUrl 值：${baseUrl}`
+		);
+	}
+
 	// 如果需要access_token，先获取
 	if (endpoint !== '/cgi-bin/token' && !query.access_token) {
 		const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl as string);
@@ -36,6 +49,10 @@ export async function wechatApiRequest(
 		query.secret = appsecret;
 	}
 
+	// 构建完整URL
+	const fullUrl = `${baseUrl}${endpoint}`;
+	console.log('[DEBUG] wechatApiRequest - Full URL:', fullUrl);
+
 	const options: IRequestOptions = {
 		headers: {
 			'Accept': 'application/json',
@@ -45,7 +62,7 @@ export async function wechatApiRequest(
 		method,
 		body,
 		qs: query,
-		uri: `${baseUrl as string}${endpoint}`,
+		uri: fullUrl,
 		json: true,
 	};
 
@@ -78,6 +95,22 @@ async function getAccessToken(
 	appsecret: string,
 	baseUrl: string,
 ): Promise<any> {
+	// 添加调试日志
+	console.log('[DEBUG] getAccessToken - Parameters:', { appid, appsecret, baseUrl });
+
+	// 验证baseUrl
+	if (!baseUrl || typeof baseUrl !== 'string') {
+		throw new NodeOperationError(this.getNode(), 
+			`微信公众号配置错误：baseUrl 无效或未设置。\n` +
+			`请检查您的凭据配置，确保 baseUrl 字段已正确设置为微信API地址（如：https://api.weixin.qq.com）。\n` +
+			`当前 baseUrl 值：${baseUrl}`
+		);
+	}
+
+	// 构建完整URL
+	const fullUrl = `${baseUrl}/cgi-bin/token`;
+	console.log('[DEBUG] getAccessToken - Full URL:', fullUrl);
+
 	const options: IRequestOptions = {
 		headers: {
 			'Accept': 'application/json',
@@ -89,7 +122,7 @@ async function getAccessToken(
 			appid: appid,
 			secret: appsecret,
 		},
-		uri: `${baseUrl}/cgi-bin/token`,
+		uri: fullUrl,
 		json: true,
 	};
 
