@@ -1,48 +1,312 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-wechat-official-account
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you use WeChat Official Account API in your n8n workflows.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+WeChat Official Account is a platform that allows businesses and organizations to create official accounts on WeChat to interact with users, publish content, and provide services.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-If you would like your node to be available on n8n cloud you can also [submit your node for verification](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/).
+## ✨ Key Features
 
-## Prerequisites
+- 🔧 **Dual Usage Mode**: Works as both workflow node and AI tool (usableAsTool: true)
+- 🔑 **Smart Token Management**: Automatic access token caching and refresh
+- 📁 **Complete Material Management**: Upload images, voice, video, and thumbnails
+- 📝 **Draft Management**: Create and publish article drafts
+- 🛡️ **Robust Error Handling**: Comprehensive error codes mapping and retry mechanisms
+- 🚀 **High Performance**: Batch processing and rate limiting support
+- 🔒 **Secure**: IP whitelist support and credential encryption
 
-You need the following installed on your development machine:
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)  
+[Compatibility](#compatibility)  
+[Usage](#usage)  
+[Resources](#resources)  
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+## Installation
 
-## Using this starter
+### Method 1: Community Node Installation
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
+### Method 2: Docker Deployment (Recommended)
+
+This plugin supports Docker deployment with user node directory mounting for better isolation and management.
+
+#### Prerequisites
+- Docker and Docker Compose installed
+- Built plugin files in `dist/` directory
+
+#### Quick Start
+
+1. **Build the plugin**:
+   ```bash
+   npm run build
    ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
+
+2. **Start with Docker Compose**:
+   ```bash
+   docker-compose up -d
    ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
 
-## More information
+3. **Access n8n**:
+   - URL: http://localhost:5679
+   - Username: admin
+   - Password: password
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+#### Docker Configuration
 
-## License
+The plugin is automatically installed to the user node directory (`~/.n8n/custom/`) inside the container:
+
+```yaml
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-wechat
+    ports:
+      - "5679:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=password
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./dist:/home/node/.n8n/custom  # Plugin files mounted to user node directory
+    command: >
+      sh -c "mkdir -p /home/node/.n8n/custom && 
+             chown -R node:node /home/node/.n8n/custom && 
+             n8n start"
+```
+
+#### Benefits of User Node Directory Installation
+
+- **Better Isolation**: Plugins are isolated in user space
+- **Easy Management**: Simple to add/remove plugins
+- **No Global Pollution**: Doesn't affect system-wide n8n installation
+- **Development Friendly**: Easy to update during development
+
+#### Verification
+
+After deployment, verify the plugin installation:
+
+```bash
+# Check if plugin files are correctly mounted
+docker exec n8n-wechat ls -la /home/node/.n8n/custom
+
+# Verify plugin files
+docker exec n8n-wechat find /home/node/.n8n/custom -name '*.js' -type f
+```
+
+You should see the WeChat Official Account node available in the n8n node panel.
+
+## Operations
+
+### Access Token
+- **Get**: Retrieve access token for WeChat Official Account API
+  - Automatic caching and refresh mechanism
+  - Support for custom cache duration
+  - Error handling for expired tokens
+
+### Material Management
+- **Upload Image**: Upload image for articles
+  - Support for base64 encoded images
+  - Automatic format validation
+  - Returns media_id for further use
+- **Upload Media**: Upload permanent media (image, voice, video, thumb)
+  - Multiple media types support
+  - File size validation
+  - Batch upload capabilities
+
+### Draft Management
+- **Add Draft**: Create a new draft article
+  - Rich text content support
+  - Media attachment handling
+  - Draft validation and preview
+- **Publish Draft**: Publish a draft article
+  - Automatic publishing workflow
+  - Status tracking and confirmation
+  - Error recovery mechanisms
+
+## 🤖 Tool Calling Mode
+
+This node supports **Tool Calling Mode** (`usableAsTool: true`), which means it can be:
+
+### Used as Workflow Node
+```
+[Trigger] → [WeChat Official Account] → [Other Nodes]
+```
+
+### Called by AI Tools
+```javascript
+// AI can directly invoke node functions
+const result = await wechatNode.execute({
+  resource: 'accessToken',
+  operation: 'get'
+});
+```
+
+### Integrated via API
+```bash
+# Direct API integration
+curl -X POST /api/wechat/upload-image \
+  -H "Content-Type: application/json" \
+  -d '{"image": "base64_encoded_image"}'
+```
+
+### Benefits of Tool Calling Mode
+- **AI Assistant Integration**: Let AI assistants directly manage WeChat operations
+- **Programmatic Access**: Use in custom scripts and applications
+- **Batch Processing**: Efficient bulk operations
+- **Real-time Integration**: Immediate response for time-sensitive tasks
+
+## 🔐 Authentication & Configuration
+
+### Credentials Setup
+
+This node requires WeChat Official Account API credentials:
+
+| Field | Description | Required |
+|-------|-------------|----------|
+| **App ID** | Your WeChat Official Account App ID | ✅ |
+| **App Secret** | Your WeChat Official Account App Secret | ✅ |
+| **Environment** | Choose 'production' or 'sandbox' | ✅ |
+| **Server IP** | Your server IP for whitelist | ⚠️ |
+
+### Getting Your Credentials
+
+1. **Login to WeChat Platform**
+   - Visit [WeChat Official Account Platform](https://mp.weixin.qq.com/)
+   - Login with your account credentials
+
+2. **Navigate to Settings**
+   - Go to **Development** > **Basic Configuration**
+   - Find your **App ID** and **App Secret**
+
+3. **Configure IP Whitelist** (Important for Production)
+   - Add your server IP to the whitelist
+   - This is required for API access in production
+
+4. **Security Best Practices**
+   - Store credentials securely in n8n credential store
+   - Use environment variables for sensitive data
+   - Regularly rotate App Secret
+   - Monitor API usage and access logs
+
+### Environment Configuration
+
+- **Production**: Use for live WeChat Official Account
+- **Sandbox**: Use for testing and development (limited functionality)
+
+### Required Permissions
+
+Ensure your WeChat Official Account has the following permissions:
+- ✅ Basic interface permissions
+- ✅ Advanced interface permissions (for media upload)
+- ✅ Custom menu permissions (if applicable)
+- ✅ Material management permissions
+
+## 📋 Usage Examples
+
+### Example 1: Upload Image and Create Draft
+
+```json
+{
+  "workflow": {
+    "nodes": [
+      {
+        "name": "Upload Image",
+        "type": "n8n-nodes-wechat-official-account",
+        "parameters": {
+          "resource": "material",
+          "operation": "uploadImage",
+          "image": "{{ $binary.data.data }}"
+        }
+      },
+      {
+        "name": "Create Draft",
+        "type": "n8n-nodes-wechat-official-account",
+        "parameters": {
+          "resource": "draft",
+          "operation": "addDraft",
+          "title": "My Article",
+          "content": "Article content with image",
+          "thumb_media_id": "{{ $node['Upload Image'].json.media_id }}"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Example 2: Batch Media Upload
+
+```json
+{
+  "resource": "material",
+  "operation": "uploadMedia",
+  "type": "image",
+  "media": [
+    {"name": "image1.jpg", "data": "base64_data_1"},
+    {"name": "image2.jpg", "data": "base64_data_2"}
+  ]
+}
+```
+
+## 🚀 Best Practices
+
+### Performance Optimization
+- **Cache Access Tokens**: Tokens are automatically cached for 2 hours
+- **Batch Operations**: Use batch upload for multiple media files
+- **Rate Limiting**: Built-in rate limiting prevents API quota exhaustion
+
+### Error Handling
+- **Automatic Retry**: Failed requests are automatically retried with exponential backoff
+- **Comprehensive Logging**: All operations are logged for debugging
+- **Graceful Degradation**: Fallback mechanisms for common failures
+
+### Security
+- **Credential Encryption**: All credentials are encrypted in n8n
+- **IP Whitelisting**: Configure IP whitelist in WeChat platform
+- **Token Rotation**: Regularly rotate App Secret for security
+
+## 🔧 Compatibility
+
+| Component | Version | Status |
+|-----------|---------|--------|
+| n8n | 0.190.0+ | ✅ Supported |
+| Node.js | 16.x+ | ✅ Supported |
+| WeChat API | v2.0 | ✅ Latest |
+
+## 📚 Resources
+
+- 📖 [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/community-nodes/)
+- 🔗 [WeChat Official Account API Documentation](https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html)
+- 🌐 [WeChat Official Account Platform](https://mp.weixin.qq.com/)
+- 💬 [Community Support Forum](https://community.n8n.io/)
+
+## 📄 License
 
 [MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+
+## 👨‍💻 Author
+
+**Jack Wang**
+- GitHub: [@jackwang](https://github.com/jackwang)
+- Email: jack@example.com
+
+## 📈 Version History
+
+### v1.0.0 (Latest)
+- ✅ Initial release with full WeChat Official Account API support
+- ✅ **Tool Calling Mode** support (`usableAsTool: true`)
+- ✅ Smart Access Token management with caching
+- ✅ Complete Material upload functionality (image, voice, video, thumb)
+- ✅ Draft creation and publishing with rich content support
+- ✅ Comprehensive error handling and retry mechanisms
+- ✅ Rate limiting and quota management
+- ✅ Batch processing capabilities
+- ✅ Security enhancements and IP whitelist support
+
+---
+
+**🎉 Ready to automate your WeChat Official Account? Install now and start building powerful workflows!**

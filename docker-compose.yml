@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-wechat
+    restart: unless-stopped
+    ports:
+      - "5679:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=password
+      - WEBHOOK_URL=http://localhost:5679/
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./dist:/home/node/.n8n/custom
+    entrypoint: >
+      /bin/sh -c "
+        # 确保custom目录存在并设置正确权限
+        mkdir -p /home/node/.n8n/custom
+        chown -R node:node /home/node/.n8n/custom
+        # 启动n8n
+        exec n8n start
+      "
+
+volumes:
+  n8n_data:
+    driver: local
