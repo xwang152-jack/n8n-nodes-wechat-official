@@ -1,0 +1,40 @@
+{
+	"compilerOptions": {
+		"target": "es2019",
+		"module": "commonjs",
+		"lib": ["es2019"],
+		"declaration": true,
+		"outDir": "./dist",
+		"rootDir": "./",
+		"removeComments": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": false,
+		"moduleResolution": "node",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"baseUrl": ".",
+		"paths": {
+		"@/*": ["./*"]
+	}
+	},
+	"include": [
+    "index.ts",
+    "nodes/**/*",
+    "credentials/**/*",
+    "package.json"
+  ],
+	"exclude": [
+		"node_modules/**/*",
+		"dist/**/*",
+		"**/*.test.ts",
+		"**/*.spec.ts"
+	]
+}

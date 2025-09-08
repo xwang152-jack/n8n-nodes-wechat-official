@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-wechat-test
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # 基础配置
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin123
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      
+      # 插件配置
+      - N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom
+      - NODE_FUNCTION_ALLOW_EXTERNAL=*
+      
+      # 日志配置
+      - N8N_LOG_LEVEL=debug
+      - N8N_LOG_OUTPUT=console
+      
+      # 工作流配置
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+      
+    volumes:
+      # n8n数据目录
+      - n8n_data:/home/node/.n8n
+      
+      # 挂载插件包
+      - ./n8n-nodes-wechat-official-1.0.0.tgz:/tmp/n8n-nodes-wechat-official-1.0.0.tgz:ro
+      
+      # 挂载插件安装脚本
+      - ./install-plugin.sh:/tmp/install-plugin.sh:ro
+      
+    command: >
+      sh -c "
+        echo 'Installing WeChat Official Account plugin...' &&
+        chmod +x /tmp/install-plugin.sh &&
+        /tmp/install-plugin.sh &&
+        echo 'Starting n8n...' &&
+        n8n start
+      "
+    
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5678/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  n8n_data:
+    driver: local
+
+networks:
+  default:
+    name: n8n-wechat-network
