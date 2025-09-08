@@ -22,16 +22,11 @@ export async function wechatApiRequest(
 		throw new NodeOperationError(this.getNode(), 'No credentials returned!');
 	}
 
-	const { appid, appsecret, environment } = credentials;
-
-	// 构建基础URL
-	const baseUrl = environment === 'sandbox' 
-		? 'https://api.weixin.qq.com/sandbox'
-		: 'https://api.weixin.qq.com';
+	const { appid, appsecret, baseUrl } = credentials;
 
 	// 如果需要access_token，先获取
 	if (endpoint !== '/cgi-bin/token' && !query.access_token) {
-		const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl);
+		const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl as string);
 		query.access_token = tokenResponse.access_token;
 	}
 
@@ -50,7 +45,7 @@ export async function wechatApiRequest(
 		method,
 		body,
 		qs: query,
-		uri: `${baseUrl}${endpoint}`,
+		uri: `${baseUrl as string}${endpoint}`,
 		json: true,
 	};
 
@@ -174,15 +169,10 @@ export async function uploadImage(
 		throw new NodeOperationError(this.getNode(), 'No credentials returned!');
 	}
 
-	const { appid, appsecret, environment } = credentials;
-
-	// 构建基础URL
-	const baseUrl = environment === 'sandbox' 
-		? 'https://api.weixin.qq.com/sandbox'
-		: 'https://api.weixin.qq.com';
+	const { appid, appsecret, baseUrl } = credentials;
 
 	// 获取access_token
-	const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl);
+	const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl as string);
 
 	// 处理不同的输入类型
 	let base64Data: string;
@@ -213,7 +203,7 @@ export async function uploadImage(
 		qs: {
 			access_token: tokenResponse.access_token,
 		},
-		uri: `${baseUrl}/cgi-bin/media/uploadimg`,
+		uri: `${baseUrl as string}/cgi-bin/media/uploadimg`,
 		formData,
 		json: true,
 	};
@@ -304,15 +294,10 @@ export async function addMaterial(
 		throw new NodeOperationError(this.getNode(), 'No credentials returned!');
 	}
 
-	const { appId, appSecret, environment } = credentials;
-
-	// 构建基础URL
-	const baseUrl = environment === 'sandbox' 
-		? 'https://api.weixin.qq.com/sandbox'
-		: 'https://api.weixin.qq.com';
+	const { appid, appsecret, baseUrl } = credentials;
 
 	// 获取access_token
-	const tokenResponse = await getAccessToken.call(this, appId as string, appSecret as string, baseUrl);
+	const tokenResponse = await getAccessToken.call(this, appid as string, appsecret as string, baseUrl as string);
 
 	// 处理不同的输入类型
 	let base64Data: string;
@@ -349,7 +334,7 @@ export async function addMaterial(
 		qs: {
 			access_token: tokenResponse.access_token,
 		},
-		uri: `${baseUrl}/cgi-bin/material/add_material`,
+		uri: `${baseUrl as string}/cgi-bin/material/add_material`,
 		formData,
 		json: true,
 	};
